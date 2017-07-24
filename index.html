@@ -37,8 +37,8 @@
 	var lang = "en";
 
 	gear.input.enableKeyboard();
-	// gear.input.enableTouch(gear.canvas);
-	gear.input.enableMouse(gear.canvas);
+	gear.input.enableTouch(gear.canvas);
+	// gear.input.enableMouse(gear.canvas);
 
 	function contain(p, c) {
 		var x1 = p.x,
@@ -65,10 +65,11 @@
 		startOff2: gear.viewport.y,
 		capture: false,
 		preload: function() {
-			gear.load.image("locked", "../res/img/locked2.png");
-			gear.load.image("opened", "../res/img/opened2.png");
-			gear.load.image("down", "../res/img/down-arrow.png");
-			gear.load.font("font", "../res/fonts/font3.otf");
+			gear.load.image("locked", "res/img/locked2.png");
+			gear.load.image("opened", "res/img/opened2.png");
+			gear.load.image("down", "res/img/down-arrow.png");
+			gear.load.font("font", "res/fonts/font3.otf");
+			gear.load.audio("click", "res/audio/click.mp3");
 			this.entity = function(x, y, r) {
 				this.x = x;
 				this.y = y;
@@ -134,6 +135,11 @@
 		},
 		prevPressed: false,
 		update: function() {
+			if (gear.input.isPressed && !this.prevPressed) {
+				gear.audios['click'].currentTime = 0;
+				gear.audios['click'].play();
+			}
+
 			if (this.mainMenu) {
 
 				if (this.startGame) {
@@ -342,13 +348,15 @@
 		cReverse: false,
 
 		preload: function() {
-			gear.load.image("menu", "../res/img/menu2.png");
-			gear.load.image("hand_pressed", "../res/img/hand2.png");
-			gear.load.image("hand", "../res/img/hand2_pressed.png");
-			gear.load.image("hand_move1", "../res/img/hand_move1.png");
-			gear.load.image("hand_move2", "../res/img/hand_move2.png");
-			gear.load.image("win", "../res/img/win.png");
-			gear.load.image("fail", "../res/img/fail.png");
+			gear.load.image("menu", "res/img/menu2.png");
+			gear.load.image("hand_pressed", "res/img/hand2.png");
+			gear.load.image("hand", "res/img/hand2_pressed.png");
+			gear.load.image("hand_move1", "res/img/hand_move1.png");
+			gear.load.image("hand_move2", "res/img/hand_move2.png");
+			gear.load.image("win", "res/img/win.png");
+			gear.load.image("fail", "res/img/fail.png");
+			gear.load.audio("win", "res/audio/swipe.mp3");
+			gear.load.audio("win_back", "res/audio/win_back.mp3");
 			this.entity = function(x, y, r) {
 				this.x = x;
 				this.y = y;
@@ -430,7 +438,7 @@
 				b: Math.abs(c1.b - c2.b)
 			};
 		},
-
+		prevPressed: false,
 		update: function() {
 			if (!this.startGame || this.win)
 				return;
@@ -440,6 +448,11 @@
 					gear.input.isPressed = false;
 					gear.state.start("menu");
 				}
+			}
+
+			if (gear.input.isPressed && !this.prevPressed) {
+				gear.audios['click'].currentTime = 0;
+				gear.audios['click'].play();
 			}
 
 			if (!this.start) {
@@ -475,7 +488,7 @@
 					this.player.x += vx;
 				}
 
-				if (this.checkFail(this.circle.x, this.player.x, 20)) {
+				if (this.checkFail(this.circle.x, this.player.x, 30)) {
 					this.fail = true;
 				} else {
 					if (!levels[this.levelNumber])
@@ -485,12 +498,16 @@
 						this.levelsSave[this.levelNumber + 1] = true;
 						console.log(this.levelsSave)
 						this.win = true;
+						gear.audios['win'].play();
 						if (this.levelNumber == 4)
 							return;
 						window.localStorage.setItem("mirror", JSON.stringify({ levels: this.levelsSave, lang: lang }));
 					}
 				}
+
 			}
+			
+			this.prevPressed = gear.input.isPressed;
 		},
 
 		render: function() {
@@ -584,10 +601,11 @@
 						tColor = null;
 
 				if (!this.cReverse) {
-					color = this.cTransition(this.cColor, this.cGreen, 0.04);
+					color = this.cTransition(this.cColor, this.cGreen, 0.1);
 					var d = this.cDist(this.cColor, this.cGreen);
 					if (d.r < 1 && d.g < 1 && d.b < 1) {
 						this.cReverse = true;
+						gear.audios['win_back'].play();
 					}
 				}
 				else {
