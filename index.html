@@ -324,6 +324,8 @@
 
 	var Test = {
 
+		tutorial: false,
+
 		startGame: false,
 		alpha: 1,
 		lTimer: 0,
@@ -353,10 +355,13 @@
 			gear.load.image("hand", "res/img/hand2_pressed.png");
 			gear.load.image("hand_move1", "res/img/hand_move1.png");
 			gear.load.image("hand_move2", "res/img/hand_move2.png");
+			gear.load.image("finger_up", "res/img/hand2.png");
+			gear.load.image("finger_down", "res/img/hand2_pressed.png");
 			gear.load.image("win", "res/img/win.png");
 			gear.load.image("fail", "res/img/fail.png");
-			gear.load.audio("win", "res/audio/swipe.mp3");
+			gear.load.audio("swipe", "res/audio/swipe.mp3");
 			gear.load.audio("win_back", "res/audio/win_back.mp3");
+			gear.load.audio("fail_back", "res/audio/fail4.mp3");
 			this.entity = function(x, y, r) {
 				this.x = x;
 				this.y = y;
@@ -385,6 +390,10 @@
 				return;
 			}
 			this.levelsSave = JSON.parse(saves).levels;
+
+			if (this.levelNumber == 0) {
+				this.tutorial = true;
+			}
 		},
 
 		checkFail: function(cx, px, d) {
@@ -406,6 +415,7 @@
 			this.win = false;
 			this.circle = new this.entity(240, 200, 30);
 			this.player = new this.entity(240, 550, 30);
+			this.tutplayer = new this.entity(240, 550, 30);
 			this.move = false;
 			this.fail = false;
 			this.start = false;
@@ -417,6 +427,13 @@
 			this.imgPressed = false;
 			this.cColor = { r: 247, g: 247, b: 247 };
 			this.cReverse = false;
+
+			//tutorial
+			this.tutorial = false;
+			this.talpha = 0;
+			this.ttimer = 0;
+			this.tstages = 0;
+			this.tchange = false;
 		},
 
 		cTransition: function(c1, c2, easing) {
@@ -440,20 +457,26 @@
 		},
 		prevPressed: false,
 		update: function() {
-			if (!this.startGame || this.win)
-				return;
-				//gear.viewport.x - 60, 10, 40, 40
+			if (gear.input.isPressed && !this.prevPressed) {
+				gear.audios['click'].currentTime = 0;
+				gear.audios['click'].play();
+			}
+
 			if (gear.input.y < 100 && gear.input.isPressed) {
 				if (containRect(gear.input, {x: gear.viewport.x - 60, y: 10, width: 40, height: 40 })) {
 					gear.input.isPressed = false;
 					gear.state.start("menu");
 				}
 			}
-
-			if (gear.input.isPressed && !this.prevPressed) {
-				gear.audios['click'].currentTime = 0;
-				gear.audios['click'].play();
+			if (this.tutorial) {
+				this.ututorial();
+				this.prevPressed = gear.input.isPressed;
+				return;
 			}
+
+			if (!this.startGame || this.win)
+				return;
+				//gear.viewport.x - 60, 10, 40, 40
 
 			if (!this.start) {
 				if (!gear.input.isPressed)
@@ -463,7 +486,7 @@
 					this.imgTimer = 0;
 					this.imgPressed = false;
 					var dx = this.circle.cx - this.circle.x,
-							vx = dx * 0.05;
+						vx = dx * 0.05;
 
 					this.circle.x += vx;
 				}
@@ -488,8 +511,9 @@
 					this.player.x += vx;
 				}
 
-				if (this.checkFail(this.circle.x, this.player.x, 30)) {
+				if (this.checkFail(this.circle.x, this.player.x, 20)) {
 					this.fail = true;
+					gear.audios['swipe'].play();
 				} else {
 					if (!levels[this.levelNumber])
 						return;
@@ -498,7 +522,7 @@
 						this.levelsSave[this.levelNumber + 1] = true;
 						console.log(this.levelsSave)
 						this.win = true;
-						gear.audios['win'].play();
+						gear.audios['swipe'].play();
 						if (this.levelNumber == 4)
 							return;
 						window.localStorage.setItem("mirror", JSON.stringify({ levels: this.levelsSave, lang: lang }));
@@ -512,6 +536,11 @@
 
 		render: function() {
 			gear.draw.clear("rgb(247, 247, 247)");
+
+			if (this.tutorial) {
+				this.rtutorial();
+				return;
+			}
 
 			/*gear.draw.color = "rgba(36, 47, 63, 0.7)";
 			gear.draw.text(this.levelNumber, x, -40, 23);
@@ -538,7 +567,7 @@
 				} else {
 					this.timerNumber = 0;
 					this.timerStart = 0;
- 				  gear.draw.text(language[lang]["rule"], x, -370, 40, "font");
+ 				    gear.draw.text(language[lang]["rule"], x, -370, 40, "font");
 					var x = (gear.viewport.x -
 									 gear.ctx.measureText(language[lang]["rule"]).width) / 2;
 					gear.draw.text(language[lang]["rule"], x, 370, 40, "font");
@@ -579,10 +608,12 @@
 				var color = null;
 
 				if (!this.cReverse) {
-					color = this.cTransition(this.cColor, this.cRed, 0.09);
+					color = this.cTransition(this.cColor, this.cRed, 0.1);
 					var d = this.cDist(this.cColor, this.cRed);
-					if (d.r < 5 && d.g < 5 && d.b < 5)
+					if (d.r < 5 && d.g < 5 && d.b < 5) {
 						this.cReverse = true;
+						gear.audios['fail_back'].play();
+					}
 				}
 				else {
 					color = this.cTransition(this.cColor, this.cGray, 0.09);
@@ -638,9 +669,9 @@
 				if (Math.abs(this.alpha) < 2) {
 					this.lTimer += 0.04;
 					gear.draw.color = "#67696d";
-					var x = gear.ctx.measureText(language[lang]["level"] + " " + (this.levelNumber + 1)).width;
+					var x = gear.ctx.measureText(language[lang]["level"] + " " + (this.levelNumber)).width;
 					var y = Math.min(Math.sin(this.lTimer) * 70, 45);
-					gear.draw.text(language[lang]["level"] + " " + (this.levelNumber + 1), (gear.viewport.x - x) / 2, y, 34, "font");
+					gear.draw.text(language[lang]["level"] + " " + (this.levelNumber), (gear.viewport.x - x) / 2, y, 34, "font");
 					gear.draw.rect((gear.viewport.x - x) / 2 - 10, 10 + y, x + 20, 1);
 
 					if (this.lTimer > 4)
@@ -649,6 +680,175 @@
 			}
 			// gear.draw.color = "red";
 			// gear.draw.rect(gear.viewport.x - 60, 10, 40, 40);
+
+		},
+
+		ututorial: function() {
+			switch(this.tstages) {
+				case 0:
+					if (Math.abs(1 - this.talpha) < 0.1) {
+						if (levels[this.levelNumber].times > 1) {
+							this.tchange = true;
+							levels[this.levelNumber].times = 0;
+						}
+
+						this.moveCircle(this.levelNumber);
+					}
+				break;
+				case 1:
+					if (Math.abs(1 - this.talpha) < 0.1 && !this.win) {
+						this.ttimer++;
+						if (this.ttimer > 70) {
+							if (levels[this.levelNumber].times < 1) {
+								this.moveCircle(this.levelNumber);
+							}
+							var vx = (this.circle.x - this.tutplayer.x) * 0.1;
+							this.tutplayer.x += vx;
+						}
+					}
+					if (!this.checkFail(this.circle.x, this.tutplayer.x, 20)) {
+						if (!levels[this.levelNumber])
+							return;
+
+						if (levels[this.levelNumber].finished) {
+							this.levelsSave[this.levelNumber + 1] = true;
+							this.win = true;
+							gear.audios['swipe'].play();
+							if (this.levelNumber == 4)
+								return;
+							window.localStorage.setItem("mirror", JSON.stringify({ levels: this.levelsSave, lang: lang }));
+						}
+					}
+				break;
+				case 2:
+
+				break;
+			}
+		},
+		talpha: 0,
+		ttimer: 0,
+		tstages: 0,
+		tchange: false,
+		rtutorial: function() {
+			gear.ctx.drawImage(gear.images['menu'], gear.viewport.x - 50, 20, 25, 25);
+
+			gear.draw.lineWidth = 2;
+			// example
+			gear.draw.color = "#808fa3";
+			gear.draw.rect(100, 200, 280, 2);
+			this.circle.render();
+
+			// player
+			gear.draw.color = "#808fa3";
+			gear.draw.rect(100, 550, 280, 2);
+			this.tutplayer.render();
+
+			if (!this.startGame) {
+				var va = (0 - this.alpha) * 0.035;
+				this.alpha += va;
+				gear.draw.clear("rgba(247, 247, 247, " + this.alpha + ")");
+				gear.draw.text(language[lang]["tutorial"], 30, -30, 34, "font");
+
+				if (Math.abs(this.alpha) < 2) {
+					this.lTimer += 0.04;
+					gear.draw.color = "#67696d";
+					var x = gear.ctx.measureText(language[lang]["tutorial"]).width;
+					var y = Math.min(Math.sin(this.lTimer) * 70, 45);
+					gear.draw.text(language[lang]["tutorial"], (gear.viewport.x - x) / 2, y, 34, "font");
+					gear.draw.rect((gear.viewport.x - x) / 2 - 10, 10 + y, x + 20, 1);
+
+					if (this.lTimer > 4)
+						this.startGame = true;
+				}
+			} else {
+
+				switch(this.tstages) {
+					case 0:
+						if (!this.tchange) {
+							var va = (1 - this.talpha) * 0.03;
+							this.talpha += va;
+							if (Math.abs(1 - this.talpha) < 0.05) {
+								// this.tchange = true;
+							}	
+						} else {
+							var va = (-.2 - this.talpha) * 0.03;
+							this.talpha += va;
+							if (Math.abs(-.2 - this.talpha) < 0.09) {
+								this.talpha = 0;
+								this.tchange = false;
+								this.tstages++;
+							}	
+						}
+						gear.draw.color = "rgba(255, 255, 255, " + this.talpha + ")";
+						gear.draw.rect(0, 0, gear.viewport.x, 150);
+						gear.draw.rect(0, 250, gear.viewport.x, gear.viewport.y);
+					break;
+					case 1:
+						if (!this.tchange) {
+							var va = (1 - this.talpha) * 0.03;
+							this.talpha += va;
+							if (Math.abs(1 - this.talpha) < 0.05) {
+								// this.tchange = true;
+							}	
+						} else {
+							var va = (-.2 - this.talpha) * 0.03;
+							this.talpha += va;
+							if (Math.abs(-.2 - this.talpha) < 0.01) {
+								this.tstages++;
+							}	
+						}
+						gear.draw.color = "rgba(255, 255, 255, " + this.talpha + ")";
+						gear.draw.rect(0, 0, gear.viewport.x, 150);
+						gear.draw.rect(0, 250, gear.viewport.x, 250);
+						gear.draw.rect(0, 600, gear.viewport.x, 300);
+
+						if (this.ttimer < 50 && this.ttimer > 10) {
+							gear.ctx.drawImage(gear.images["finger_down"], this.tutplayer.x - 35, 650, 100, 100);
+						}
+						else if (this.ttimer > 50) {
+							gear.ctx.drawImage(gear.images["finger_up"], this.tutplayer.x - 25, 650, 70, 70);
+						}
+					break;
+					case 2:
+
+					break;
+				}
+
+				gear.draw.color = "rgba(51, 51, 51, " + (.1 + this.talpha) + ")";
+				gear.draw.text(language[lang]['rules'][this.tstages], 0, -370, 50, "font");
+				var x = (gear.viewport.x -
+								 gear.ctx.measureText(language[lang]['rules'][this.tstages]).width) / 2;
+				gear.draw.text(language[lang]['rules'][this.tstages], x, 390, 50, "font");
+
+				if (this.win) {
+					var color = null,
+							tColor = null;
+
+					if (!this.cReverse) {
+						color = this.cTransition(this.cColor, this.cGreen, 0.1);
+						var d = this.cDist(this.cColor, this.cGreen);
+						if (d.r < 1 && d.g < 1 && d.b < 1) {
+							this.cReverse = true;
+							gear.audios['win_back'].play();
+						}
+					}
+					else {
+						color = this.cTransition(this.cColor, this.cGray, 0.09);
+						var d = this.cDist(this.cColor, this.cGray);
+						if (d.r < 5 && d.g < 5 && d.b < 5) {
+							if (this.levelNumber == 4)
+								gear.state.start("menu");
+							else
+								gear.state.start("test", { levelNumber: this.levelNumber + 1, levelsSave: this.levelsSave });
+						}
+					}
+					gear.draw.clear(color);
+					gear.ctx.drawImage(gear.images['win'],
+														(gear.viewport.x - 200) / 2,
+														(gear.viewport.y - 200) / 2,
+														200, 200);
+				}
+			}
 
 		}
 	}

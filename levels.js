@@ -1,5 +1,6 @@
 var levels = {
   "0": {
+    times: 0,
     dist: 100,
     finished: false,
     update: function(c, timer) {
@@ -11,6 +12,7 @@ var levels = {
           c.x = c.cx;
           c.t = 0;
           timer = 0;
+          this.times++;
         }
         this.finished = true;
       } else {
