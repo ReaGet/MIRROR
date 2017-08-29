@@ -106,18 +106,21 @@
 			// this.startGame = false;
 			var saves = window.localStorage.getItem("mirror");
 			if (!saves) {
-				this.levels[0] = true;
-				window.localStorage.setItem("mirror", JSON.stringify({ levels: { 0: true }, lang: "en" }));
+				this.levels[0].done = true;
+				window.localStorage.setItem("mirror", JSON.stringify({ levels: { 0: { done: true, tries: 0 } }, lang: "en" }));
+				
+				this.levels[0].opened = true;
+				
 				return;
 			}
 			this.levelsSave = JSON.parse(saves).levels;
 			lang = JSON.parse(saves).lang || "en";
 			if (!this.levelsSave) {
-				this.levelsSave = { 0: true };
+				this.levelsSave = { 0: { done: true, tries: 0 } };
 				window.localStorage.setItem("mirror", JSON.stringify({ levels: this.levelsSave, lang: lang }));
 			}
 			for (var key in this.levelsSave) {
-				this.levels[key].opened = this.levelsSave[key];
+				this.levels[key].opened = this.levelsSave[key].done;
 			}
 			// this.levels[1].opened = true;
 			// this.levels[2].opened = true;
@@ -326,6 +329,8 @@
 
 		tutorial: false,
 
+		tries: 0,
+
 		startGame: false,
 		alpha: 1,
 		lTimer: 0,
@@ -385,11 +390,18 @@
 			this.reset();
 			var saves = window.localStorage.getItem("mirror");
 			if (!saves) {
-				this.levels[0] = true;
-				window.localStorage.setItem("mirror", JSON.stringify({ levels: { 0: true }, lang: "en" }));
+				this.levels[0].done = true;
+				window.localStorage.setItem("mirror", JSON.stringify({ levels: { 0: { done: true, tries: 0 } }, lang: "en" }));
 				return;
 			}
+
 			this.levelsSave = JSON.parse(saves).levels;
+
+			if (!this.levelsSave[this.levelNumber + 1]) {
+				this.levelsSave[this.levelNumber + 1] = { done: false, tries: 0 };
+			}
+
+			console.log(this.levelsSave)
 
 			if (this.levelNumber == 0) {
 				this.tutorial = true;
@@ -511,16 +523,18 @@
 					this.player.x += vx;
 				}
 
-				if (this.checkFail(this.circle.x, this.player.x, 20)) {
+				if (this.checkFail(this.circle.x, this.player.x, 20) && !this.fail) {
 					this.fail = true;
 					gear.audios['swipe'].play();
+					this.levelsSave[this.levelNumber].tries++;
+					window.localStorage.setItem("mirror", JSON.stringify({ levels: this.levelsSave, lang: lang }));
 				} else {
 					if (!levels[this.levelNumber])
 						return;
 
-					if (levels[this.levelNumber].finished) {
-						this.levelsSave[this.levelNumber + 1] = true;
-						console.log(this.levelsSave)
+					if (levels[this.levelNumber].finished && !this.win) {
+						this.levelsSave[this.levelNumber + 1].done = true;
+						this.levelsSave[this.levelNumber].tries++;
 						this.win = true;
 						gear.audios['swipe'].play();
 						if (this.levelNumber == 4)
@@ -710,8 +724,9 @@
 						if (!levels[this.levelNumber])
 							return;
 
-						if (levels[this.levelNumber].finished) {
-							this.levelsSave[this.levelNumber + 1] = true;
+						if (levels[this.levelNumber].finished && !this.win) {
+							this.levelsSave[this.levelNumber + 1].done = true;
+							this.levelsSave[this.levelNumber].tries++;
 							this.win = true;
 							gear.audios['swipe'].play();
 							if (this.levelNumber == 4)
