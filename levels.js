@@ -237,8 +237,6 @@ var levels = {
     }
   },
   "11": {
-    tries: 0,
-    times: 0,
     dist: -240,
     finished: false,
     sx: 360,
@@ -251,7 +249,6 @@ var levels = {
           c.x = c.cx;
           c.t = 0;
           timer = 0;
-          this.times++;
         }
         this.finished = true;
       } else {
@@ -260,8 +257,6 @@ var levels = {
     }
   },
   "12": {
-    tries: 0,
-    times: 0,
     dist: -240,
     finished: false,
     sx: 360,
@@ -275,7 +270,6 @@ var levels = {
           c.x = c.cx;
           c.t = 0;
           timer = 0;
-          this.times++;
         }
         this.finished = true;
       } else {
@@ -284,8 +278,6 @@ var levels = {
     }
   },
   "13": {
-    tries: 0,
-    times: 0,
     dist: 120,
     finished: false,
     stages: 0,
@@ -311,7 +303,6 @@ var levels = {
               c.x = c.cx;
               c.t = 0;
               timer = 0;
-              this.times++;
               this.stages = 0;
             }
             this.finished = true;
@@ -321,8 +312,6 @@ var levels = {
     }
   },
   "14": {
-    tries: 0,
-    times: 0,
     dist: 120,
     finished: false,
     stages: 0,
@@ -347,7 +336,6 @@ var levels = {
             if (timer % 120 == 0) {
               c.x = c.cx;
               timer = 0;
-              this.times++;
               this.stages = 0;
             }
             this.finished = true;
@@ -357,8 +345,6 @@ var levels = {
     }
   },
   "15": {
-    tries: 0,
-    times: 0,
     dist: 120,
     finished: false,
     sx: 120,
@@ -384,7 +370,6 @@ var levels = {
             if (timer % 120 == 0) {
               c.x = c.cx;
               timer = 0;
-              this.times++;
               this.stages = 0;
             }
             this.finished = true;
@@ -394,8 +379,6 @@ var levels = {
     }
   },
   "16": {
-    tries: 0,
-    times: 0,
     dist: 120,
     finished: false,
     sx: 120,
@@ -423,12 +406,120 @@ var levels = {
         break;
         case 2:
           if (c.x < c.cx + this.dist) {
-            c.x++;
+            c.x += 1.5;
           } else {
             if (timer % 120 == 0) {
               c.x = c.cx;
               timer = 0;
-              this.times++;
+              this.stages = 0;
+            }
+            this.finished = true;
+          }
+        break;
+      }
+    }
+  },
+  "17": {
+    dist: 120,
+    finished: false,
+    stages: 0,
+    update: function(c, timer) {
+      switch(this.stages) {
+        case 0:
+          if (c.x > c.cx - this.dist / 2) {
+            c.x -= 2;
+          } else {
+            if (timer % 60 == 0) {
+              this.stages++;
+            }
+          }
+          this.finished = false;
+        break;
+        case 1:
+          if (c.x < c.cx + this.dist / 2) {
+            c.x += 2;
+          } else {
+            if (timer % 60 == 0) {
+              this.stages++;
+            }
+          }
+        break;
+        case 2:
+          if (c.x > c.cx) {
+            c.x -= 1;
+          } else {
+            if (timer % 120 == 0) {
+              c.x = c.cx;
+              timer = 0;
+              this.stages = 0;
+            }
+            this.finished = true;
+          }
+        break;
+      }
+    }
+  },
+  "18": {
+    dist: 120,
+    finished: false,
+    stages: 0,
+    update: function(c, timer) {
+      switch(this.stages) {
+        case 0:
+          if (c.x > c.cx - this.dist / 2) {
+            c.x -= 2;
+          } else {
+            if (timer % 30 == 0) {
+              this.stages++;
+            }
+          }
+          this.finished = false;
+        break;
+        case 1:
+          if (c.x < c.cx) {
+            c.x += 2.5;
+          } else {
+            if (timer % 120 == 0) {
+              c.x = c.cx;
+              timer = 0;
+              this.stages = 0;
+            }
+            this.finished = true;
+          }
+        break;
+      }
+    }
+  },
+  "19": {
+    dist: 120,
+    finished: false,
+    stages: 0,
+    update: function(c, timer) {
+      switch(this.stages) {
+        case 0:
+          if (c.x > c.cx - this.dist / 2) {
+            c.x -= 1.5;
+          } else {
+            if (timer % 30 == 0) {
+              this.stages++;
+            }
+          }
+          this.finished = false;
+        break;
+        case 1:
+          if (c.x < c.cx) {
+            c.x += 2.5;
+          } else {
+            this.stages++;
+          }
+        break;
+        case 2:
+          if (c.x < c.cx + this.dist) {
+            c.x += 1;
+          } else {
+            if (timer % 120 == 0) {
+              c.x = c.cx;
+              timer = 0;
               this.stages = 0;
             }
             this.finished = true;
@@ -437,82 +528,4 @@ var levels = {
       }
     }
   }
-  /*"2": {
-    dist: -100,
-    finished: false,
-    update: function(c, timer) {
-      if (c.x > c.cx + this.dist) {
-        c.x = gear.easing.linear(c.t, c.cx, -1, 1);
-      }
-      if (Math.abs(c.x - (c.cx + this.dist)) < 2) {
-        if (timer % 60 == 0) {
-          c.x = c.cx;
-          c.t = 0;
-          timer = 0;
-        }
-        this.finished = true;
-      } else {
-        this.finished = false;
-      }
-    }
-  },
-  "3": {
-    dist: 100,
-    finished: false,
-    update: function(c, timer) {
-      if (c.x < c.cx + this.dist) {
-        c.x = gear.easing.linear(c.t, c.cx, 1, 3);
-      }
-      if (Math.abs(c.x - (c.cx + this.dist)) < 2) {
-        if (timer % 60 == 0) {
-          c.x = c.cx;
-          c.t = 0;
-          timer = 0;
-        }
-        this.finished = true;
-      } else {
-        this.finished = false;
-      }
-    }
-  },
-  "4": {
-    dist: 100,
-    finished: false,
-    update: function(c, timer) {
-      if (c.x < c.cx + this.dist) {
-        var vx = (c.cx + this.dist - c.x) * 0.03
-        c.x += vx;
-      }
-      if (Math.abs(c.x - (c.cx + this.dist)) < 2) {
-        if (timer % 60 == 0) {
-          c.x = c.cx;
-          c.t = 0;
-          timer = 0;
-        }
-        this.finished = true;
-      } else {
-        this.finished = false;
-      }
-    }
-  },
-  "5": {
-    dist: 130,
-    finished: false,
-    update: function(c, timer) {
-      if (c.x < c.cx + this.dist) {
-        var vx = (c.cx + this.dist - c.x) * 0.07
-        c.x += vx;
-      }
-      if (Math.abs(c.x - (c.cx + this.dist)) < 2) {
-        if (timer % 60 == 0) {
-          c.x = c.cx;
-          c.t = 0;
-          timer = 0;
-        }
-        this.finished = true;
-      } else {
-        this.finished = false;
-      }
-    }
-  }*/
 };
