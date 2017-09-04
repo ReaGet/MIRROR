@@ -13,8 +13,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -35,8 +35,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -57,8 +57,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -79,8 +79,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -101,8 +101,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -123,8 +123,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -145,8 +145,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -167,8 +167,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -189,8 +189,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -209,8 +209,8 @@ var levels = {
           c.x = c.cx;
           c.t = 0;
           timer = 0;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -229,8 +229,8 @@ var levels = {
           c.x = c.cx;
           c.t = 0;
           timer = 0;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -252,8 +252,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -276,8 +276,8 @@ var levels = {
           c.t = 0;
           timer = 0;
           this.times++;
-          this.finished = true;
         }
+        this.finished = true;
       } else {
         this.finished = false;
       }
@@ -300,6 +300,7 @@ var levels = {
               this.stages++;
             }
           }
+          this.finished = false;
         break;
         case 1:
           if (c.x > c.cx - this.dist) {
@@ -312,10 +313,8 @@ var levels = {
               timer = 0;
               this.times++;
               this.stages = 0;
-              this.finished = true;
             }
-          } else {
-            this.finished = false;
+            this.finished = true;
           }
         break;
       }
@@ -328,7 +327,6 @@ var levels = {
     finished: false,
     stages: 0,
     update: function(c, timer) {
-      utils.log(this.stages, 2);
       switch(this.stages) {
         case 0:
           if (c.x < c.cx + this.dist) {
@@ -339,6 +337,7 @@ var levels = {
               this.stages++;
             }
           }
+          this.finished = false;
         break;
         case 1:
           if (c.x > c.cx + this.dist / 2) {
@@ -350,10 +349,89 @@ var levels = {
               timer = 0;
               this.times++;
               this.stages = 0;
-              this.finished = true;
             }
+            this.finished = true;
+          }
+        break;
+      }
+    }
+  },
+  "15": {
+    tries: 0,
+    times: 0,
+    dist: 120,
+    finished: false,
+    sx: 120,
+    stages: 0,
+    update: function(c, timer) {
+      switch(this.stages) {
+        case 0:
+          if (c.x < c.cx + this.dist) {
+            c.x++;
+          }
+          if (Math.abs(c.x - (c.cx + this.dist)) < 2) {
+            if (timer % 120 == 0) {
+              this.stages++;
+            }
+          }
+          this.finished = false;
+        break;
+        case 1:
+          if (c.x > c.cx + this.dist / 2) {
+            c.x--;
+          }
+          if (Math.abs(c.x - (c.cx + this.dist / 2)) < 2) {
+            if (timer % 120 == 0) {
+              c.x = c.cx;
+              timer = 0;
+              this.times++;
+              this.stages = 0;
+            }
+            this.finished = true;
+          }
+        break;
+      }
+    }
+  },
+  "16": {
+    tries: 0,
+    times: 0,
+    dist: 120,
+    finished: false,
+    sx: 120,
+    stages: 0,
+    update: function(c, timer) {
+      switch(this.stages) {
+        case 0:
+          if (c.x < c.cx + this.dist / 2) {
+            c.x++;
           } else {
-            this.finished = false;
+            if (timer % 120 == 0) {
+              this.stages++;
+            }
+          }
+          this.finished = false;
+        break;
+        case 1:
+          if (c.x > c.cx) {
+            c.x--;
+          } else {
+            if (timer % 120 == 0) {
+              this.stages++;
+            }
+          }
+        break;
+        case 2:
+          if (c.x < c.cx + this.dist) {
+            c.x++;
+          } else {
+            if (timer % 120 == 0) {
+              c.x = c.cx;
+              timer = 0;
+              this.times++;
+              this.stages = 0;
+            }
+            this.finished = true;
           }
         break;
       }

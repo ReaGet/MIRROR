@@ -122,6 +122,7 @@
                 for (var key in this.levelsSave) {
                     this.levels[key].opened = this.levelsSave[key].done;
                 }
+
                 // for (var i = 0; i < 30; i++) {
                 //  this.levels[i].opened = true;
                 // }
@@ -279,7 +280,7 @@
 
 
                 var h = false,
-                        v = false;
+                    v = false;
                 for (var i = 1; i < this.levels.length; i++) {
                     var l = this.levels[i],
                             pl = this.levels[i - 1];
@@ -413,8 +414,8 @@
                         this.player.cx = levels[this.levelNumber].sx;
                         this.player.x = levels[this.levelNumber].sx;
                     }
-                    if (levels[this.levelNumber].stages)
-                    	levels[this.levelNumber].stages = 0;
+
+                    levels[this.levelNumber].stages = 0;
                 }
 
                 if (this.levelNumber == 0) {
@@ -468,8 +469,8 @@
                         this.player.cx = levels[this.levelNumber].sx;
                         this.player.x = levels[this.levelNumber].sx;
                     }
-                    if (levels[this.levelNumber].stages)
-                    	levels[this.levelNumber].stages = 0;
+
+                    levels[this.levelNumber].stages = 0;
 
                 }
             },
@@ -544,12 +545,12 @@
                     } else {
                         this.move = false;
                         var dx = this.player.cx - this.player.x,
-                                vx = dx * 0.05;
+                            vx = dx * 0.05;
 
                         this.player.x += vx;
                     }
 
-                    if (this.checkFail(this.circle.x, this.player.x, 25) && !this.fail) {
+                    if (this.checkFail(this.circle.x, this.player.x, 35) && !this.fail) {
                         this.fail = true;
                         gear.audios['swipe'].play();
                         this.levelsSave[this.levelNumber].tries++;
@@ -597,8 +598,10 @@
                         this.timerStart++;
                         if (this.timerStart % 40 == 0 && this.timerStart != 0) {
                             this.timerNumber++;
-                            if (this.timerNumber == 2)
+                            if (this.timerNumber == 2) {
+                            	levels[this.levelNumber].stages = 0;
                                 this.start = true;
+                            }
                         }
                         gear.draw.text(language[lang]['start'][this.timerNumber], x, -370, 70, "font");
                         var x = (gear.viewport.x -
