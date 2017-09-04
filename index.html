@@ -495,10 +495,16 @@
                 };
             },
             prevPressed: false,
+            constX: null,
             update: function() {
                 if (gear.input.isPressed && !this.prevPressed) {
                     gear.audios['click'].currentTime = 0;
                     gear.audios['click'].play();
+                    this.constX = gear.input.x;
+                }
+
+                if (!gear.input.isPressed && !this.prevPressed) {
+                	this.constX = null;
                 }
 
                 if (gear.input.y < 100 && gear.input.isPressed) {
@@ -513,11 +519,15 @@
                     return;
                 }
 
-                if (!this.startGame || this.win)
+                if (!this.startGame || this.win) {
+                	this.prevPressed = gear.input.isPressed;
                     return;
+                }
                     //gear.viewport.x - 60, 10, 40, 40
 
                 if (!this.start) {
+                	if (Math.abs(gear.input.x - this.constX) > 5 && this.constX != null)
+                        this.start = true;
                     if (!gear.input.isPressed)
                         this.moveCircle(this.levelNumber);
                     else {
@@ -550,7 +560,7 @@
                         this.player.x += vx;
                     }
 
-                    if (this.checkFail(this.circle.x, this.player.x, 35) && !this.fail) {
+                    if (this.checkFail(this.circle.x, this.player.x, 17) && !this.fail) {
                         this.fail = true;
                         gear.audios['swipe'].play();
                         this.levelsSave[this.levelNumber].tries++;
@@ -595,19 +605,20 @@
                 if (!this.start) {
                     gear.draw.color = "#67696d";
                     if (gear.input.isPressed && this.startGame && gear.input.y > 100) {
-                        this.timerStart++;
-                        if (this.timerStart % 40 == 0 && this.timerStart != 0) {
-                            this.timerNumber++;
-                            if (this.timerNumber == 2) {
-                            	levels[this.levelNumber].stages = 0;
-                                this.start = true;
-                            }
-                        }
-                        gear.draw.text(language[lang]['start'][this.timerNumber], x, -370, 70, "font");
+                        // this.timerStart++;
+                        // if (this.timerStart % 40 == 0 && this.timerStart != 0) {
+                        //     this.timerNumber++;
+                        //     if (this.timerNumber == 2) {
+                        //     	levels[this.levelNumber].stages = 0;
+                        //     }
+                        // }
+                        // if (gear.input.x != this.prevPressed.x)
+                            // this.start = true;
+                        gear.draw.text(language[lang]['start'][0], x, -370, 70, "font");
                         var x = (gear.viewport.x -
-                                         gear.ctx.measureText(language[lang]['start'][this.timerNumber]).width) / 2;
+                                         gear.ctx.measureText(language[lang]['start'][0]).width) / 2;
                         if (this.timerNumber != 2)
-                            gear.draw.text(language[lang]['start'][this.timerNumber], x, 370, 70, "font");
+                            gear.draw.text(language[lang]['start'][0], x, 370, 70, "font");
                     } else {
                         this.timerNumber = 0;
                         this.timerStart = 0;
