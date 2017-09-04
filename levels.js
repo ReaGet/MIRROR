@@ -295,13 +295,12 @@ var levels = {
           this.finished = false;
         break;
         case 1:
-          if (c.x > c.cx - this.dist) {
+          if (c.x > c.cx + this.dist / 2) {
             c.x--;
           }
-          if (Math.abs(c.x - (c.cx - this.dist)) < 2) {
-            if (timer % 60 == 0) {
+          if (Math.abs(c.x - (c.cx + this.dist / 2)) < 2) {
+            if (timer % 120 == 0) {
               c.x = c.cx;
-              c.t = 0;
               timer = 0;
               this.stages = 0;
             }
@@ -329,12 +328,13 @@ var levels = {
           this.finished = false;
         break;
         case 1:
-          if (c.x > c.cx + this.dist / 2) {
+          if (c.x > c.cx - this.dist) {
             c.x--;
           }
-          if (Math.abs(c.x - (c.cx + this.dist / 2)) < 2) {
-            if (timer % 120 == 0) {
+          if (Math.abs(c.x - (c.cx - this.dist)) < 2) {
+            if (timer % 60 == 0) {
               c.x = c.cx;
+              c.t = 0;
               timer = 0;
               this.stages = 0;
             }

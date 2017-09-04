@@ -501,6 +501,7 @@
                     gear.audios['click'].currentTime = 0;
                     gear.audios['click'].play();
                     this.constX = gear.input.x;
+                    levels[this.levelNumber].stages = 0;
                 }
 
                 if (!gear.input.isPressed && !this.prevPressed) {
@@ -878,7 +879,7 @@
 
                     if (this.win) {
                         var color = null,
-                                tColor = null;
+                            tColor = null;
 
                         if (!this.cReverse) {
                             color = this.cTransition(this.cColor, this.cGreen, 0.1);
