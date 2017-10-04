@@ -527,5 +527,84 @@ var levels = {
         break;
       }
     }
+  },
+  "20": {
+    dist: 120,
+    finished: false,
+    stages: 0,
+    update: function(c, timer) {
+      switch(this.stages) {
+        case 0:
+          if (c.x > c.cx - this.dist) {
+            c.x -= 2;
+          } else {
+            this.stages++;
+          }
+          this.finished = false;
+        break;
+        case 1:
+          if (c.x < c.cx + this.dist) {
+            c.x += 2;
+          } else {
+            this.stages++;
+          }
+        break;
+        case 2:
+          if (c.x > c.cx - this.dist) {
+            c.x -= 2.5;
+          } else {
+            if (timer % 120 == 0) {
+              c.x = c.cx;
+              timer = 0;
+              this.stages = 0;
+            }
+            this.finished = true;
+          }
+        break;
+      }
+    }
+  },
+  "21": {
+    dist: 120,
+    finished: false,
+    stages: 0,
+    update: function(c, timer) {
+      switch(this.stages) {
+        case 0:
+          if (c.x > c.cx - this.dist / 2) {
+            c.x -= 1.5;
+          } else {
+            this.stages++;
+          }
+          this.finished = false;
+        break;
+        case 1:
+          if (c.x < c.cx + this.dist / 2) {
+            c.x += 1.5;
+          } else {
+            this.stages++;
+          }
+        break;
+        case 2:
+          if (c.x > c.cx - this.dist) {
+            c.x -= 1.5;
+          } else {
+            this.stages++;
+          }
+        break;
+        case 3:
+          if (c.x < c.cx + this.dist) {
+            c.x += 1.5;
+          } else {
+            if (timer % 120 == 0) {
+              c.x = c.cx;
+              timer = 0;
+              this.stages = 0;
+            }
+            this.finished = true;
+          }
+        break;
+      }
+    }
   }
 };
